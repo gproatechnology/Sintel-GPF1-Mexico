@@ -110,3 +110,8 @@
 2026-03-06 05:57:11 | INFO | AUTH | SUCCESS | User: testuser from testclient
 2026-03-06 05:57:11 | INFO | AUTH | SUCCESS | User: testuser from testclient
 2026-03-06 05:57:12 | INFO | AUTH | SUCCESS | User: testuser from testclient
+2026-03-11 01:56:27 | INFO | AUTH | SUCCESS | User: admin from 172.19.0.1
+2026-03-11 02:06:14 | INFO | AUTH | SUCCESS | User: admin from 172.19.0.4
+2026-03-11 02:16:20 | INFO | AUTH | FAILED | User: admin@gpproatechnology.com from 172.19.0.4
+2026-03-11 02:18:18 | INFO | AUTH | SUCCESS | User: admin@gpproatechnology.com from 172.19.0.4
+2026-03-11 02:36:30 | INFO | AUTH | SUCCESS | User: admin@gpproatechnology.com from 172.19.0.4

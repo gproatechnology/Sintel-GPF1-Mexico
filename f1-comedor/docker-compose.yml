@@ -50,8 +50,6 @@ services:
       - ./frontend:/app
     networks:
       - f1-comedor-network
-    environment:
-      - VITE_API_URL=http://app:8001
 
 networks:
   f1-comedor-network:

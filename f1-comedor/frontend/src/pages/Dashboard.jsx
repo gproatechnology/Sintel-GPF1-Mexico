@@ -9,9 +9,9 @@ import { reportsAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
 // ============================================
-// MOCK DATA PARA DEMO - PRESENTACIÓN EJECUTIVA
+// DATOS REALES DESDE LA API
 // ============================================
-const USE_MOCK_DATA = true // Cambiar a false para datos reales
+const USE_MOCK_DATA = false // Cambiar a true para datos de prueba
 
 const MOCK_DATA = {
   stats: {
@@ -143,12 +143,12 @@ export default function Dashboard() {
     }
   }
 
-  const dashboardData = stats?.data || {}
-  const companyReport = companyData?.data || []
-  const categoryReport = categoryData?.data || []
+  const dashboardData = stats?.data || stats || {}
+  const companyReport = companyData?.data?.companies || companyData?.data || []
+  const categoryReport = categoryData?.data?.categories || categoryData?.data || []
   const dailyInfo = dailyData?.data || {}
 
-  // Prepare chart data
+  // Prepare chart data from real API
   const hourlyData = (dashboardData.consumptions_by_hour || []).map(item => ({
     hour: item.hour,
     consumo: item.count,
@@ -174,55 +174,39 @@ export default function Dashboard() {
     percentage: totalCompanyConsumptions > 0 ? ((item.consumos / totalCompanyConsumptions) * 100).toFixed(1) : 0
   }))
 
-  // Table columns
+  // Table columns - using daily summary data
   const tableColumns = [
     { 
-      header: 'Hora', 
-      accessor: 'time',
-      render: (row) => <span className="font-mono text-slate-600">{row.time || '-'}</span>
+      header: 'Fecha', 
+      accessor: 'date',
+      render: (row) => <span className="font-mono text-slate-600">{row.date || '-'}</span>
     },
     { 
-      header: 'Empleado', 
-      accessor: 'employee_name',
+      header: 'Consumidores', 
+      accessor: 'total_consumers',
       render: (row) => (
         <div>
-          <p className="font-medium text-slate-800">{row.employee_name || '-'}</p>
+          <p className="font-medium text-slate-800">{row.total_consumers || 0}</p>
         </div>
       )
     },
     { 
-      header: 'Empresa', 
-      accessor: 'company_name',
+      header: 'Monto Total', 
+      accessor: 'total_amount',
+      render: (row) => <span className="font-semibold text-emerald-600">{formatCurrency(row.total_amount)}</span>
+    },
+    { 
+      header: 'Por Turno', 
+      accessor: 'by_meal_type',
       render: (row) => (
-        <Badge variant="info">{row.company_name || '-'}</Badge>
+        <div className="flex gap-2">
+          {row.by_meal_type?.map((mt, idx) => (
+            <Badge key={idx} variant={mt.meal_type === 'BREAKFAST' ? 'warning' : mt.meal_type === 'LUNCH' ? 'success' : 'purple'}>
+              {mt.meal_type === 'BREAKFAST' ? 'D' : mt.meal_type === 'LUNCH' ? 'C' : 'Ce'}: {mt.total_consumers}
+            </Badge>
+          )) || <span className="text-gray-400">-</span>}
+        </div>
       )
-    },
-    { 
-      header: 'Categoría', 
-      accessor: 'category_name',
-      render: (row) => <span className="text-slate-600">{row.category_name || '-'}</span>
-    },
-    { 
-      header: 'Turno', 
-      accessor: 'meal_type',
-      render: (row) => {
-        const variants = {
-          'BREAKFAST': 'warning',
-          'LUNCH': 'success',
-          'DINNER': 'purple'
-        }
-        const labels = {
-          'BREAKFAST': 'Desayuno',
-          'LUNCH': 'Comida',
-          'DINNER': 'Cena'
-        }
-        return <Badge variant={variants[row.meal_type] || 'default'}>{labels[row.meal_type] || row.meal_type}</Badge>
-      }
-    },
-    { 
-      header: 'Monto', 
-      accessor: 'total',
-      render: (row) => <span className="font-semibold text-emerald-600">{formatCurrency(row.total)}</span>
     },
   ]
 
@@ -268,9 +252,9 @@ export default function Dashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <StatsCard
-          title="Comensales Hoy"
-          value={formatNumber(dashboardData.total_employees_today || 0)}
-          subtitle="Empleados registrados"
+          title="Consumos Hoy"
+          value={formatNumber(dashboardData.total_consumptions_today || 0)}
+          subtitle="Total de consumos registrados"
           icon={Icons.Users}
           color="blue"
           trend="up"
@@ -286,16 +270,16 @@ export default function Dashboard() {
           trendValue="+8% vs ayer"
         />
         <StatsCard
-          title="Consumos por Turno"
-          value={`D: ${dashboardData.breakfast_count || 0} | C: ${dashboardData.lunch_count || 0} | Ce: ${dashboardData.dinner_count || 0}`}
-          subtitle="Desayuno / Comida / Cena"
+          title="Empleados Activos"
+          value={formatNumber(dashboardData.active_employees || 0)}
+          subtitle="Empleados registrados"
           icon={Icons.Clock}
           color="purple"
         />
         <StatsCard
           title="Límite Alcanzado"
           value={dashboardData.employees_at_limit || 0}
-          subtitle="Empleados en límite"
+          subtitle="Empleados en límite diario"
           icon={Icons.Alert}
           color="amber"
         />
@@ -470,16 +454,16 @@ export default function Dashboard() {
 
       {/* Recent Consumptions Table */}
       <Card 
-        title="📋 Últimos Consumos" 
+        title="📋 Resumen Diario" 
         action={
           <span className="text-sm text-slate-500">
-            Mostrando últimos 20 registros
+            Fecha: {dateFrom}
           </span>
         }
       >
         <Table 
           columns={tableColumns} 
-          data={(dailyInfo.recent_consumptions || []).slice(0, 20)} 
+          data={[dailyInfo]} 
         />
       </Card>
     </AppLayout>
