@@ -243,8 +243,8 @@ export function StatsCard({ title, value, subtitle, icon: Icon, color = 'red', t
             </div>
           )}
         </div>
-        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${iconBgClasses[color]} flex items-center justify-center shadow-lg`}>
-           justify-center shadow-lg<Icon className="w-7 h-7 text-white" />
+        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${iconBgClasses[color]} flex items-center justify-center shadow-lg flex-shrink-0`}>
+          <Icon className="w-7 h-7 text-white" />
         </div>
       </div>
     </div>
@@ -263,6 +263,89 @@ export function Card({ children, className = '', title, action }) {
       )}
       <div className="p-6">
         {children}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// F1 Racing Stats Card - Telemetry Dashboard
+// ============================================
+export function F1StatsCard({ title, value, subtitle, trend, trendValue, icon: Icon, type = 'default' }) {
+  // F1 Racing color schemes based on card type
+  const typeConfig = {
+    default: {
+      bg: 'bg-slate-900',
+      border: 'border-slate-700',
+      accent: 'border-l-red-600',
+      title: 'text-slate-400',
+      value: 'text-white',
+      subtitle: 'text-slate-500',
+      trend: 'text-emerald-400',
+      iconBg: 'bg-gradient-to-br from-red-600 to-red-800',
+      iconGlow: 'shadow-[0_0_20px_rgba(220,38,38,0.4)]'
+    },
+    revenue: {
+      bg: 'bg-slate-900',
+      border: 'border-slate-700',
+      accent: 'border-l-emerald-500',
+      title: 'text-slate-400',
+      value: 'text-emerald-400',
+      subtitle: 'text-slate-500',
+      trend: 'text-emerald-400',
+      iconBg: 'bg-gradient-to-br from-emerald-600 to-green-700',
+      iconGlow: 'shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+    },
+    consumption: {
+      bg: 'bg-slate-900',
+      border: 'border-slate-700',
+      accent: 'border-l-amber-500',
+      title: 'text-slate-400',
+      value: 'text-white',
+      subtitle: 'text-slate-500',
+      trend: 'text-amber-400',
+      iconBg: 'bg-gradient-to-br from-amber-500 to-orange-600',
+      iconGlow: 'shadow-[0_0_20px_rgba(245,158,11,0.4)]'
+    },
+    alert: {
+      bg: 'bg-slate-900',
+      border: 'border-slate-700',
+      accent: 'border-l-red-500',
+      title: 'text-slate-400',
+      value: 'text-red-500',
+      subtitle: 'text-slate-500',
+      trend: 'text-red-400',
+      iconBg: 'bg-gradient-to-br from-red-600 to-rose-700',
+      iconGlow: 'shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+    }
+  }
+
+  const config = typeConfig[type] || typeConfig.default
+
+  return (
+    <div className={`${config.bg} rounded-xl border ${config.border} border-l-4 ${config.accent} p-5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group`}>
+      {/* Carbon fiber texture effect */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)' }}></div>
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-white/5 to-transparent rounded-full -mr-12 -mt-12 transform group-hover:scale-110 transition-transform duration-500"></div>
+      
+      <div className="flex items-start justify-between relative z-10 gap-4">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-black italic uppercase tracking-widest ${config.title} mb-1">{title}</p>
+          <p className="text-2xl font-black font-mono tracking-tighter ${config.value} truncate">{value}</p>
+          {subtitle && <p className="text-xs text-slate-500 mt-1 font-medium">{subtitle}</p>}
+          {trend && trendValue && (
+            <div className={`flex items-center mt-2 text-xs ${config.trend}`}>
+              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="font-bold font-mono">{trendValue}</span>
+            </div>
+          )}
+        </div>
+        {/* Icon container with fixed width to prevent text overlap */}
+        <div className={`w-12 h-12 rounded-xl ${config.iconBg} flex items-center justify-center ${config.iconGlow} flex-shrink-0`}>
+          {Icon && <Icon className="w-6 h-6 text-white" />}
+        </div>
       </div>
     </div>
   )

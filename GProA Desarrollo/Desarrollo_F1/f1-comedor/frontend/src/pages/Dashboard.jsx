@@ -5,7 +5,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend, AreaChart, Area, PieChart, Pie, Cell
 } from 'recharts'
-import { AppLayout, StatsCard, Card, Table, Badge, Button } from '@/components/AppLayout'
+import { AppLayout, StatsCard, Card, Table, Badge, Button, F1StatsCard } from '@/components/AppLayout'
 import { reportsAPI } from '@/services/api'
 import toast from 'react-hot-toast'
 
@@ -305,39 +305,39 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatsCard
-          title="Comensales Hoy"
+      {/* F1 Stats Cards - Telemetry Panel */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <F1StatsCard
+          title="SQUAD ATTENDANCE"
           value={formatNumber(dashboardData.total_employees_today || 0)}
-          subtitle="Empleados registrados"
+          subtitle="Personal Registrado"
           icon={Icons.Users}
-          color="gray"
+          type="default"
           trend="up"
-          trendValue="+12% vs ayer"
+          trendValue="+12% vs Lap Anterior"
         />
-        <StatsCard
-          title="Ingresos del Día"
+        <F1StatsCard
+          title="RACE REVENUE"
           value={formatCurrency(dashboardData.total_amount_today)}
-          subtitle="Monto total facturado"
+          subtitle="Monto Total Facturado"
           icon={Icons.Currency}
-          color="red"
+          type="revenue"
           trend="up"
-          trendValue="+8% vs ayer"
+          trendValue="+8% vs Lap Anterior"
         />
-        <StatsCard
-          title="Consumos por Turno"
+        <F1StatsCard
+          title="SESSION CONSUMPTION"
           value={`D: ${dashboardData.breakfast_count || 0} | C: ${dashboardData.lunch_count || 0} | Ce: ${dashboardData.dinner_count || 0}`}
           subtitle="Desayuno / Comida / Cena"
           icon={Icons.Clock}
-          color="gray"
+          type="consumption"
         />
-        <StatsCard
-          title="Límite Alcanzado"
+        <F1StatsCard
+          title="FUEL LIMIT (CAP)"
           value={dashboardData.employees_at_limit || 0}
-          subtitle="Aviso de operaciones"
+          subtitle="Avisos de Operación"
           icon={Icons.Alert}
-          color="amber"
+          type="alert"
         />
       </div>
 
