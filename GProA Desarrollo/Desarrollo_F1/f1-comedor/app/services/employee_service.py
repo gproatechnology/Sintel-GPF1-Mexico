@@ -196,3 +196,24 @@ def scan_employee(db: Session, qr_code: str) -> Optional[EmployeeScanResponse]:
         can_consume=can_consume,
         message=message
     )
+
+
+def regenerate_qr(db: Session, employee_id: int) -> Optional[Employee]:
+    """Regenerate employee's QR code"""
+    employee = get_employee(db, employee_id)
+    if not employee:
+        return None
+    
+    # Generate new unique QR code
+    new_qr_code = qr_service.generate_unique_qr_data()
+    
+    # Ensure unique QR code
+    existing = get_employee_by_qr_code(db, new_qr_code)
+    while existing and existing.id != employee_id:
+        new_qr_code = qr_service.generate_unique_qr_data()
+        existing = get_employee_by_qr_code(db, new_qr_code)
+    
+    employee.qr_code = new_qr_code
+    db.commit()
+    db.refresh(employee)
+    return employee

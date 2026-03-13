@@ -126,3 +126,16 @@ def scan_employee_qr(
     if not scan_result:
         raise HTTPException(status_code=404, detail="QR code not recognized")
     return scan_result
+
+
+@router.post("/{employee_id}/regenerate-qr")
+def regenerate_employee_qr(
+    employee_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Regenerate employee's QR code"""
+    employee = employee_service.regenerate_qr(db, employee_id)
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    return {"qr_code": employee.qr_code, "message": "QR code regenerated successfully"}

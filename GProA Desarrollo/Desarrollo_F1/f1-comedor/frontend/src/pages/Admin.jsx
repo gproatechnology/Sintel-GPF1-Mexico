@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/context/AuthContext'
@@ -27,7 +27,7 @@ function Navbar() {
             <svg className="w-5 h-5 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span className="hidden sm:inline">Pit Wall</span>
+            <span className="hidden sm:inline">Volver</span>
           </button>
           
           <div className="flex items-center space-x-3">
@@ -86,10 +86,19 @@ function Modal({ isOpen, onClose, title, children }) {
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('employees')
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [formData, setFormData] = useState({})
   const queryClient = useQueryClient()
+
+  // Reactive search - actualiza la búsqueda con debounce de 300ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
 
   const tabs = [
     { id: 'employees', label: 'Empleados', icon: '👥' },
@@ -98,10 +107,10 @@ export default function Admin() {
     { id: 'menu', label: 'Menú', icon: '🍽️' },
   ]
 
-  // Fetch data based on active tab
+  // Fetch data based on active tab - búsqueda reactiva
   const { data: employeesData, isLoading: employeesLoading } = useQuery({
-    queryKey: ['employees', searchTerm],
-    queryFn: () => employeesAPI.getAll({ search: searchTerm, limit: 100 }),
+    queryKey: ['employees', debouncedSearch],
+    queryFn: () => employeesAPI.getAll({ search: debouncedSearch, limit: 100 }),
     enabled: activeTab === 'employees',
   })
 
@@ -180,10 +189,22 @@ export default function Admin() {
     mutationFn: (id) => employeesAPI.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries(['employees'])
-      toast.success('✅ Empleado eliminado')
+      toast.success('✅ Empleado eliminado y sesiones limpiadas')
     },
     onError: (error) => {
       toast.error(error.response?.data?.detail || 'Error al eliminar empleado')
+    },
+  })
+
+  // Mutación para regenerar QR
+  const regenerateEmployeeQR = useMutation({
+    mutationFn: (id) => employeesAPI.regenerateQR(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['employees'])
+      toast.success('✅ QR regenerado: ' + data.data?.qr_code)
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.detail || 'Error al regenerar QR')
     },
   })
 
@@ -267,11 +288,13 @@ export default function Admin() {
           { name: 'phone', label: 'Teléfono', type: 'text' },
           { name: 'company_id', label: 'Empresa ID', type: 'number', required: true },
           { name: 'category_id', label: 'Categoría ID', type: 'number', required: true },
+          { name: 'fecha_vencimiento', label: 'Fecha de Vencimiento (Staff/Proveedores)', type: 'date' },
         ]
       case 'companies':
         return [
           { name: 'name', label: 'Nombre', type: 'text', required: true },
           { name: 'code', label: 'Código', type: 'text', required: true },
+          { name: 'id_centro_costos', label: 'ID Centro de Costos', type: 'text', required: false },
         ]
       case 'categories':
         return [
@@ -374,6 +397,7 @@ export default function Admin() {
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">Email</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">Empresa</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">Categoría</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-600">Vencimiento</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">QR</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">Acciones</th>
                     </tr>
@@ -386,8 +410,22 @@ export default function Admin() {
                         <td className="px-4 py-3">{emp.email}</td>
                         <td className="px-4 py-3">{emp.company?.name || '-'}</td>
                         <td className="px-4 py-3">{emp.category?.name || '-'}</td>
+                        <td className="px-4 py-3">
+                          {emp.fecha_vencimiento ? (
+                            <span className={`px-2 py-1 rounded text-xs ${new Date(emp.fecha_vencimiento) < new Date() ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                              {new Date(emp.fecha_vencimiento) < new Date() ? 'Expirado' : new Date(emp.fecha_vencimiento).toLocaleDateString()}
+                            </span>
+                          ) : '-'}
+                        </td>
                         <td className="px-4 py-3 font-mono text-xs">{emp.qr_code}</td>
                         <td className="px-4 py-3">
+                          <button
+                            onClick={() => regenerateEmployeeQR.mutate(emp.id)}
+                            className="text-blue-600 hover:text-blue-800 mr-3"
+                            title="Re-generar QR"
+                          >
+                            QR
+                          </button>
                           <button
                             onClick={() => handleDelete(emp.id)}
                             className="text-red-600 hover:text-red-800"
@@ -399,7 +437,7 @@ export default function Admin() {
                     ))}
                     {employees.length === 0 && (
                       <tr>
-                        <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+                        <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
                           No hay empleados registrados
                         </td>
                       </tr>
@@ -415,6 +453,7 @@ export default function Admin() {
                     <tr>
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">Código</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">Nombre</th>
+                      <th className="px-4 py-3 text-left font-semibold text-gray-600">Centro Costos</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">Estado</th>
                       <th className="px-4 py-3 text-left font-semibold text-gray-600">Acciones</th>
                     </tr>
@@ -424,6 +463,7 @@ export default function Admin() {
                       <tr key={company.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 font-mono">{company.code}</td>
                         <td className="px-4 py-3">{company.name}</td>
+                        <td className="px-4 py-3 font-mono text-xs">{company.id_centro_costos || '-'}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded text-xs ${company.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                             {company.is_active ? 'Activo' : 'Inactivo'}
@@ -441,7 +481,7 @@ export default function Admin() {
                     ))}
                     {companies.length === 0 && (
                       <tr>
-                        <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
+                        <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
                           No hay empresas registradas
                         </td>
                       </tr>

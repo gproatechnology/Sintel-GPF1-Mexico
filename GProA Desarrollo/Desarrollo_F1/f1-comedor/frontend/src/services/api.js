@@ -140,6 +140,7 @@ export const employeesAPI = {
   delete: (id) => api.delete(`/api/employees/${id}`),
   scan: (qrCode) => api.post('/api/employees/scan', { qr_code: qrCode }),
   getQR: (id) => api.get(`/api/employees/${id}/qr`, { responseType: 'blob' }),
+  regenerateQR: (id) => api.post(`/api/employees/${id}/regenerate-qr`),
 }
 
 // Menu Items API

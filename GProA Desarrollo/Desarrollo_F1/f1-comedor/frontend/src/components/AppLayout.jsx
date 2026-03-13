@@ -167,7 +167,7 @@ export function AppLayout({ children }) {
                   title="Volver al inicio"
                 >
                   <Icons.Home />
-                  <span className="hidden sm:inline">Pit Wall (Inicio)</span>
+                  <span className="hidden sm:inline">Volver</span>
                 </button>
               )}
               <div>
