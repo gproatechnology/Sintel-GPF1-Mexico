@@ -21,28 +21,36 @@ La aplicación se compone de **tres servicios** Docker:
 
 Cada contenedor expone su propio puerto internamente. No se trata de un solo puerto porque son componentes independientes que se comunican entre sí a través de la red de Docker.
 
-### Opción 1: Arrancar todo con Docker Compose (recomendado)
+### Opción 1: Arrancar todo con Docker Compose (local)
 
 ```bash
-# Ya estás en el directorio principal del proyecto (f1-comedor)
-# No necesitas cambiar de directorio
+# 1. Entrar al proyecto
+cd f1-comedor
 
-# (opcional) crear red compartida si aún no existe
+# 2. Crear red compartida (solo la primera vez)
 docker network create f1-comedor-network 2>/dev/null || true
 
-# levantar y reconstruir servicios
+# 3. Levantar servicios
 docker-compose up -d --build
 
-# esperar ~10‑15 segundos a que la base de datos arranque
+# 4. Esperar ~15 segundos a que la base de datos arranque
 echo "esperando que la base de datos esté lista..." && sleep 15
 
-# comprobar que los contenedores estén en buen estado
+# 5. Verificar contenedores
 docker-compose ps
-# debería verse: db (healthy), app (healthy), frontend (running)
+# Debería verse: db (healthy), app (healthy), frontend (running)
 
-# cargar datos de prueba (único uso o después de borrar la BD)
+# 6. Cargar datos de prueba (solo la primera vez o si reseteas la BD)
 docker-compose exec app python -m app.seed
 ```
+
+**Puertos expuestos:**
+
+| Servicio | Puerto | URL |
+|----------|--------|-----|
+| Frontend | 8000 | http://localhost:8000 |
+| API | 8001 | http://localhost:8001 |
+| PostgreSQL | 5432 | localhost:5432 |
 
 > 🔁 Si enfrentas problemas de datos duplicados, detén los contenedores con
 > `docker-compose down -v` antes de ejecutar el seed para resetear la BD.
@@ -59,7 +67,9 @@ cd f1-comedor/frontend
 npm install
 
 # 3. Crear archivo .env con la URL de la API
-echo "VITE_API_URL=http://localhost:8000" > .env
+# Si la API está en Docker: VITE_API_URL=http://localhost:8001
+# Si la API es local: VITE_API_URL=http://localhost:8000
+echo "VITE_API_URL=http://localhost:8001" > .env
 
 # 4. Ejecutar servidor de desarrollo
 npm run dev
@@ -67,8 +77,8 @@ npm run dev
 
 **5. Abrir en navegador:** http://localhost:5173
 
-> ⚠️ **IMPORTANTE:** La API debe estar corriendo en `http://localhost:8000`
-> - Si usas Docker: `docker-compose up -d` (la API queda en puerto interno)
+> ⚠️ **IMPORTANTE:** La API debe estar corriendo en `http://localhost:8001`
+> - Si usas Docker: La API está en `http://localhost:8001` (ver docker-compose.yml)
 > - Si es local: `uvicorn app.main:app --reload` en otra terminal
 
 ### Opción 3: Solo API (desarrollo local)
