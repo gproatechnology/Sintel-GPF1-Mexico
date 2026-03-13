@@ -104,6 +104,55 @@ export default function Dashboard() {
   const [dateTo, setDateTo] = useState(new Date().toISOString().split('T')[0])
   const navigate = useNavigate()
 
+  // ============================================
+  // OPERATIONAL INTELLIGENCE - State & Logic
+  // ============================================
+  
+  // Real-time capacity tracking
+  const [currentOccupancy, setCurrentOccupancy] = useState(127)
+  const maxCapacity = 200
+  
+  const capacityPercent = Math.round((currentOccupancy / maxCapacity) * 100)
+  const capacityColor = capacityPercent < 70 ? 'text-emerald-400' : capacityPercent < 90 ? 'text-amber-400' : 'text-red-500'
+  const capacityStatus = capacityPercent < 70 ? 'OPTIMAL' : capacityPercent < 90 ? 'CAUTION' : 'SATURATED'
+  const estimatedWaitTime = capacityPercent < 70 ? '~2 min' : capacityPercent < 90 ? '~5 min' : '~12 min'
+  
+  // Trend Pulse calculation (15 min comparison)
+  const [last15minCount, setLast15minCount] = useState(45)
+  const [prev15minCount, setPrev15minCount] = useState(38)
+  const trendPulse = prev15minCount > 0 ? ((last15minCount - prev15minCount) / prev15minCount) * 100 : 0
+  
+  // Entry rate (people per minute)
+  const [entryRate, setEntryRate] = useState(23)
+  
+  // Average ticket calculation
+  const avgTicket = dashboardData.total_employees_today > 0 
+    ? dashboardData.total_amount_today / dashboardData.total_employees_today 
+    : 149.78
+  
+  // Weekly Heatmap data (mock historical demand)
+  const heatmapData = {
+    Thursday: { Breakfast: 45, Lunch: 78, Dinner: 32 },
+    Friday: { Breakfast: 52, Lunch: 85, Dinner: 45 },
+    Saturday: { Breakfast: 38, Lunch: 92, Dinner: 28 },
+    Sunday: { Breakfast: 25, Lunch: 65, Dinner: 15 }
+  }
+
+  // Simulate real-time updates (in production, use WebSocket or REST API polling)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Simulate occupancy fluctuation
+      setCurrentOccupancy(prev => Math.max(50, Math.min(200, prev + Math.floor(Math.random() * 21) - 10)))
+      // Simulate entry rate
+      setEntryRate(prev => Math.max(5, Math.min(80, prev + Math.floor(Math.random() * 11) - 5)))
+      // Simulate trend changes
+      setLast15minCount(prev => Math.max(10, Math.min(100, prev + Math.floor(Math.random() * 11) - 5)))
+      setPrev15minCount(last15minCount)
+    }, 30000) // Update every 30 seconds
+    
+    return () => clearInterval(interval)
+  }, [last15minCount])
+
   // Scroll to top when component mounts or route changes
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -339,6 +388,138 @@ export default function Dashboard() {
           icon={Icons.Alert}
           type="alert"
         />
+      </div>
+
+      {/* ============================================ */}
+      {/* OPERATIONAL INTELLIGENCE LAYER */}
+      {/* ============================================ */}
+      
+      {/* Early Warning System - Smart Alerts Banner */}
+      {((currentOccupancy > 100) || (avgTicket > 179.74) || (entryRate > 50)) && (
+        <div className="mb-6 p-4 rounded-xl border-l-4 bg-gradient-to-r from-red-900/80 to-slate-900/80 backdrop-blur-sm animate-pulse">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center animate-pulse">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-red-400 font-bold uppercase tracking-wider text-sm">⚠️ Early Warning System</p>
+              <div className="flex flex-wrap gap-3 mt-1">
+                {currentOccupancy > 100 && (
+                  <span className="text-xs text-red-300">🔴 Saturation: {currentOccupancy}/200 ({Math.round(currentOccupancy/200*100)}%)</span>
+                )}
+                {avgTicket > 179.74 && (
+                  <span className="text-xs text-red-300">🔴 Ticket deviation: +{((avgTicket - 149.78) / 149.78 * 100).toFixed(1)}%</span>
+                )}
+                {entryRate > 50 && (
+                  <span className="text-xs text-red-300">🔴 Entry rate: {entryRate}/min</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Intelligence Grid - 3 columns */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        
+        {/* 1. Real-Time Capacity Gauge */}
+        <div className="bg-slate-900 rounded-xl border border-slate-700 p-5" style={{ background: 'linear-gradient(145deg, #0f172a, #111827)' }}>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">🏎️ PIT LANE CAPACITY</h3>
+          <div className="flex items-center justify-between">
+            {/* Circular Gauge */}
+            <div className="relative w-24 h-24">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle cx="48" cy="48" r="40" stroke="#1e293b" strokeWidth="8" fill="none" />
+                <circle 
+                  cx="48" cy="48" r="40" 
+                  stroke={capacityColor} 
+                  strokeWidth="8" 
+                  fill="none"
+                  strokeDasharray={`${(currentOccupancy / 200) * 251.2} 251.2`}
+                  className="transition-all duration-500"
+                  style={{ filter: `drop-shadow(0 0 8px ${capacityColor}80)` }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-white">{currentOccupancy}</span>
+                <span className="text-xs text-slate-500">/ 200</span>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className={`text-lg font-bold ${capacityColor.replace('text-', 'text-')}`}>{capacityPercent}%</p>
+              <p className="text-xs text-slate-500 mt-1">{estimatedWaitTime}</p>
+              <div className="mt-2 flex items-center gap-1">
+                <span className={`w-2 h-2 rounded-full ${capacityColor.replace('text-', 'bg-')}`}></span>
+                <span className="text-xs text-slate-400">{capacityStatus}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Trend Pulse Indicator */}
+        <div className="bg-slate-900 rounded-xl border border-slate-700 p-5" style={{ background: 'linear-gradient(145deg, #0f172a, #111827)' }}>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">📊 TREND PULSE (15 min)</h3>
+          <div className="flex items-center justify-between h-full">
+            <div>
+              <p className="text-3xl font-bold text-white">{last15minCount}</p>
+              <p className="text-xs text-slate-500">consumptions</p>
+              <div className={`flex items-center gap-1 mt-2 ${trendPulse >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {trendPulse >= 0 ? (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
+                ) : (
+                  <svg className="w-4 h-4 rotate-180" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
+                )}
+                <span className="font-bold">{trendPulse >= 0 ? '+' : ''}{trendPulse.toFixed(1)}%</span>
+              </div>
+            </div>
+            {/* Mini sparkline */}
+            <div className="h-16 w-24 bg-slate-800/50 rounded-lg p-2">
+              <svg viewBox="0 0 100 50" className="w-full h-full">
+                <polyline 
+                  fill="none" 
+                  stroke={trendPulse >= 0 ? '#00e676' : '#ff5252'} 
+                  strokeWidth="2" 
+                  points="0,50 20,45 40,40 60,35 80,30 100,25"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Weekly Heatmap (GP Weekend) */}
+        <div className="bg-slate-900 rounded-xl border border-slate-700 p-5" style={{ background: 'linear-gradient(145deg, #0f172a, #111827)' }}>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">🗓️ GP WEEKEND HEATMAP</h3>
+          <div className="grid grid-cols-4 gap-1">
+            {/* Header */}
+            <div className="text-[10px] text-slate-500 text-center">J</div>
+            <div className="text-[10px] text-slate-500 text-center">V</div>
+            <div className="text-[10px] text-slate-500 text-center">S</div>
+            <div className="text-[10px] text-slate-500 text-center">D</div>
+            {/* Breakfast */}
+            <div className={`h-8 rounded ${heatmapData.Thursday.Breakfast >= 70 ? 'bg-emerald-600' : heatmapData.Thursday.Breakfast >= 40 ? 'bg-emerald-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Friday.Breakfast >= 70 ? 'bg-emerald-600' : heatmapData.Friday.Breakfast >= 40 ? 'bg-emerald-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Saturday.Breakfast >= 70 ? 'bg-emerald-600' : heatmapData.Saturday.Breakfast >= 40 ? 'bg-emerald-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Sunday.Breakfast >= 70 ? 'bg-emerald-600' : heatmapData.Sunday.Breakfast >= 40 ? 'bg-emerald-800' : 'bg-slate-700'}`}></div>
+            {/* Lunch */}
+            <div className={`h-8 rounded ${heatmapData.Thursday.Lunch >= 70 ? 'bg-red-600' : heatmapData.Thursday.Lunch >= 40 ? 'bg-red-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Friday.Lunch >= 70 ? 'bg-red-600' : heatmapData.Friday.Lunch >= 40 ? 'bg-red-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Saturday.Lunch >= 70 ? 'bg-red-600' : heatmapData.Saturday.Lunch >= 40 ? 'bg-red-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Sunday.Lunch >= 70 ? 'bg-red-600' : heatmapData.Sunday.Lunch >= 40 ? 'bg-red-800' : 'bg-slate-700'}`}></div>
+            {/* Dinner */}
+            <div className={`h-8 rounded ${heatmapData.Thursday.Dinner >= 70 ? 'bg-amber-600' : heatmapData.Thursday.Dinner >= 40 ? 'bg-amber-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Friday.Dinner >= 70 ? 'bg-amber-600' : heatmapData.Friday.Dinner >= 40 ? 'bg-amber-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Saturday.Dinner >= 70 ? 'bg-amber-600' : heatmapData.Saturday.Dinner >= 40 ? 'bg-amber-800' : 'bg-slate-700'}`}></div>
+            <div className={`h-8 rounded ${heatmapData.Sunday.Dinner >= 70 ? 'bg-amber-600' : heatmapData.Sunday.Dinner >= 40 ? 'bg-amber-800' : 'bg-slate-700'}`}></div>
+          </div>
+          <div className="flex justify-between mt-2 text-[10px] text-slate-500">
+            <span>☀️ Desayuno</span>
+            <span>🍽️ Comida</span>
+            <span>🌙 Cena</span>
+          </div>
+        </div>
       </div>
 
       {/* Charts Row 1 */}
