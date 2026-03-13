@@ -216,6 +216,41 @@ El servicio de QR está en `app/core/qr_service.py`. Utiliza la librería
 implementando `QRProviderInterface`.
 
 
+## 📚 Documentación Adicional
+
+Para colaboradores y desarrolladores, consulte estos documentos:
+
+| Documento | Descripción |
+|-----------|-------------|
+| [FILOSOFIA.md](FILOSOFIA.md) | Filosofía de operación, modelo de negocio, arquitectura e ideas futuras |
+| [AUDITORIA.md](AUDITORIA.md) | Auditoría técnica, estado del sistema, problemas y soluciones |
+| [SPRINTS.md](SPRINTS.md) | Historial de sprints y desarrollo |
+
+### Para nuevos colaboradores
+
+1. **Clonar el repo:**
+   ```bash
+   git clone https://github.com/gproatechnology/GProA_F1.git
+   cd GProA_F1/f1-comedor
+   ```
+
+2. **Leer documentación:**
+   - Comenzar por `FILOSOFIA.md` para entender el negocio
+   - Revisar `AUDITORIA.md` para el estado técnico
+
+3. **Entorno de desarrollo:**
+   - Para UI: `cd frontend && npm run dev` (desarrollo rápido)
+   - Para todo: `docker-compose up -d --build`
+
+### Flujo de trabajo
+
+1. Crear branch: `git checkout -b feature/nombre-feature`
+2. Hacer cambios y commit: `git commit -m "Descripción"`
+3. Push: `git push origin feature/nombre-feature`
+4. Crear Pull Request en GitHub
+
+---
+
 ## 📝 Licencia
 
 MIT
