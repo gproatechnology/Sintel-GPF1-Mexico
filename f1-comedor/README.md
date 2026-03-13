@@ -47,32 +47,25 @@ docker-compose exec app python -m app.seed
 > 🔁 Si enfrentas problemas de datos duplicados, detén los contenedores con
 > `docker-compose down -v` antes de ejecutar el seed para resetear la BD.
 
-### Opción 2: Solo front‑end (desarrollo local)
+### Opción 2: Solo front‑end (desarrollo local) - RECOMENDADO para UI
+
+**Ventajas:** Desarrollo rápido con Hot Module Replacement (HMR)
 
 ```bash
+# 1. Instalar dependencias (solo la primera vez)
 cd frontend
 npm install
+
+# 2. Crear archivo .env con la URL de la API
+echo "VITE_API_URL=http://localhost:8000" > .env
+
+# 3. Ejecutar servidor de desarrollo
 npm run dev
 ```
 
-*En este caso deberás apuntar `VITE_API_URL` a `http://localhost:8000` porque
-la API estará corriendo en tu máquina, no en Docker.*
+**4. Abrir en navegador:** http://localhost:5173
 
-> 💡 **Nota para entornos remotos (Codespaces/GitHub.dev)**
-> 
-> - El navegador que utiliza GitHub.dev/Codespaces no forma parte de la red de
->   Docker. Por eso `http://app:8000` no es accesible desde el lado del cliente.
-> - Con la versión actual del frontend no necesitas tocar nada: el valor por
->   defecto de `VITE_API_URL` es vacío, y el cliente hace las peticiones a
->   rutas relativas (`/api/...`). El servidor de desarrollo de Vite, que sí
->   corre dentro del contenedor, *proxía* esas rutas a `http://localhost:8000`.
-> - Si prefieres definirlo manualmente, usa la URL pública que GitHub te da para
->   el puerto 8000 (algo como `https://<workspace>-8000.github.dev`).
-
-Esta flexibilidad asegura que la aplicación funcionará tanto en tu máquina
-local como dentro de un Codespace remoto.
-
-
+> 💡 **Nota:** La API debe estar corriendo en `http://localhost:8000` (puede ser local o Docker)
 
 ### Opción 3: Solo API (desarrollo local)
 
