@@ -340,8 +340,6 @@ export function F1StatsCard({ title, value, subtitle, trend, trendValue, icon: I
     </div>
   )
 }
-  )
-}
 
 // Enterprise Table
 export function Table({ columns, data, onRowClick }) {
