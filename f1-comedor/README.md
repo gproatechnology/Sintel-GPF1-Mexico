@@ -52,20 +52,24 @@ docker-compose exec app python -m app.seed
 **Ventajas:** Desarrollo rápido con Hot Module Replacement (HMR)
 
 ```bash
-# 1. Instalar dependencias (solo la primera vez)
-cd frontend
+# 1. Entrar al proyecto
+cd f1-comedor/frontend
+
+# 2. Instalar dependencias (solo la primera vez)
 npm install
 
-# 2. Crear archivo .env con la URL de la API
+# 3. Crear archivo .env con la URL de la API
 echo "VITE_API_URL=http://localhost:8000" > .env
 
-# 3. Ejecutar servidor de desarrollo
+# 4. Ejecutar servidor de desarrollo
 npm run dev
 ```
 
-**4. Abrir en navegador:** http://localhost:5173
+**5. Abrir en navegador:** http://localhost:5173
 
-> 💡 **Nota:** La API debe estar corriendo en `http://localhost:8000` (puede ser local o Docker)
+> ⚠️ **IMPORTANTE:** La API debe estar corriendo en `http://localhost:8000`
+> - Si usas Docker: `docker-compose up -d` (la API queda en puerto interno)
+> - Si es local: `uvicorn app.main:app --reload` en otra terminal
 
 ### Opción 3: Solo API (desarrollo local)
 
