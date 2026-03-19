@@ -1,6 +1,286 @@
 # 📋 Auditoría Técnica - F1 Comedor
 
-## Resumen Ejecutivo
+## ⚠️ Aviso Importante
+
+> Esta auditoría ha sido actualizada con una evaluación más estricta de nivel empresa. La conclusión anterior de "listo para producción" ha sido revisada y ajustada para reflejar mejor la realidad de un sistema en producción crítica a escala.
+
+---
+
+## 📊 Evaluación General (Nivel Empresa)
+
+| Área           | Estado declarado | Estado real             |
+| -------------- | ---------------- | ----------------------- |
+| Funcionalidad  | ✅               | ✅                       |
+| Arquitectura   | ✅               | ✅                       |
+| Seguridad      | ✅               | 🟡 (buena, no completa) |
+| DevOps         | 🟡              | 🟠                      |
+| Escalabilidad  | 🟡              | 🟠                      |
+| Observabilidad | ❌ (no mencionada) | 🔴                      |
+
+---
+
+## 🔴 1. Problemas CRÍTICOS (no marcados anteriormente)
+
+### 1.1 🚨 "Listo para producción" → **NO completamente cierto**
+
+La conclusión anterior decía:
+
+> "listo para producción"
+
+👉 Esto es **optimista pero incompleto**
+
+#### Faltan pilares clave:
+
+- ❌ Monitoreo (Prometheus / logs estructurados)
+- ❌ Alertas
+- ❌ Backups automatizados de PostgreSQL
+- ❌ Estrategia de recuperación (disaster recovery)
+
+👉 En producción real:
+
+> Si el sistema cae, **no hay garantías de recuperación automática**
+
+---
+
+### 1.2 🔐 Seguridad incompleta (aunque buena base)
+
+Tienes:
+
+- JWT ✔
+- bcrypt ✔
+- rate limiting ✔
+
+#### Pero falta:
+
+- 🚫 Rotación de tokens
+- 🚫 Invalidación de sesiones (logout real)
+- 🚫 Protección contra replay attacks
+- 🚫 Headers de seguridad completos en backend
+
+#### Recomendación crítica:
+
+Agregar:
+
+```
+- X-Frame-Options
+- X-Content-Type-Options
+- Content-Security-Policy
+```
+
+👉 Nginx ayuda, pero backend también debe reforzar
+
+---
+
+### 1.3 🧪 Tests insuficientes para producción real
+
+73% coverage = **bien para MVP**, no para producción crítica.
+
+#### Problema real:
+
+- No mencionas:
+  - tests de carga
+  - tests concurrentes
+  - tests de seguridad
+
+👉 Ejemplo crítico:
+Escaneo simultáneo de QR → ¿race condition?
+
+---
+
+## 🟠 2. Riesgos IMPORTANTES
+
+### 2.1 🧵 Concurrencia (muy importante en tu sistema)
+
+Tu sistema tiene:
+
+- escaneo QR
+- validación de duplicados
+- límites diarios
+
+👉 Esto es sensible a:
+**race conditions**
+
+#### Ejemplo:
+
+2 escaneos simultáneos → pueden pasar validación
+
+#### Solución:
+
+- Transacciones DB
+- Locks (`SELECT FOR UPDATE`)
+- Constraints únicos
+
+---
+
+### 2.2 📊 Cacheo (no detallado)
+
+Dices:
+
+> "Cacheo implementado"
+
+Pero no especificas:
+
+- ¿Redis?
+- ¿TTL?
+- ¿Invalidación?
+
+👉 Riesgo:
+Datos inconsistentes en dashboard
+
+---
+
+### 2.3 🐳 Docker (bien pero incompleto para producción)
+
+Muy bien:
+
+- sin puertos expuestos ✔
+- red interna ✔
+
+#### Pero falta:
+
+- ❗ Para producción real:
+  - Reverse proxy público (Nginx externo)
+  - HTTPS (Let's Encrypt)
+  - Orquestador:
+    - Docker Swarm o Kubernetes (si escala)
+
+---
+
+### 2.4 🔄 Migraciones de DB (NO mencionadas)
+
+🚨 Esto es crítico y no aparece:
+
+- Alembic o equivalente
+
+👉 Sin migraciones:
+
+- romperás producción al cambiar modelos
+
+---
+
+## 🟡 3. Áreas BUENAS pero mejorables
+
+### 3.1 🧱 Arquitectura → muy bien
+
+✔ separación clara
+✔ services layer
+✔ modularidad
+
+👉 Nivel: **semi-empresa / empresa pequeña**
+
+---
+
+### 3.2 🔐 Seguridad → buena base
+
+✔ JWT + refresh
+✔ bcrypt
+✔ rate limiting
+✔ auditoría
+
+👉 Le falta endurecimiento (hardening)
+
+---
+
+### 3.3 📱 Frontend → sólido
+
+✔ PWA
+✔ roles
+✔ protected routes
+
+#### Problema real:
+
+- Admin.jsx de 600 líneas → deuda técnica
+
+---
+
+### 3.4 📊 Reportes → bien diseñados
+
+✔ export Excel
+✔ métricas
+✔ dashboard
+
+👉 Mejorable con:
+
+- agregaciones precomputadas
+
+---
+
+## 🟢 4. Cosas que hiciste MUY bien (nivel alto real)
+
+Esto sí es destacable:
+
+- Auditoría real implementada (no solo logging)
+- Eliminación de bypass (muchos lo dejan)
+- Rate limiting activo
+- QR con control de duplicados
+- Roles definidos correctamente
+- PWA incluida (poco común en MVPs)
+
+👉 Esto ya está por encima del 80% de proyectos similares
+
+---
+
+## 📉 Score REAL ajustado
+
+| Área          | Score  |
+| ------------- | ------ |
+| Backend       | 9/10   |
+| Frontend      | 8.5/10 |
+| Seguridad     | 7.5/10 |
+| Testing       | 7/10   |
+| DevOps        | 6.5/10 |
+| Escalabilidad | 6.5/10 |
+
+---
+
+## 🧾 🧠 Conclusión REAL (sin suavizar)
+
+👉 Tu sistema es:
+
+✅ **Producción controlada (empresa interna / piloto)**
+❌ **No aún producción crítica a gran escala**
+
+---
+
+## 🚀 Para llevarlo a NIVEL EMPRESA REAL
+
+Prioridad estricta:
+
+### 🔴 Nivel 1 (obligatorio)
+
+- Migraciones (Alembic)
+- Backups automáticos DB
+- Locks / concurrencia en consumos
+- Headers de seguridad completos
+
+### 🟠 Nivel 2
+
+- Redis cache real
+- Monitoreo (Prometheus + logs estructurados)
+- Tests >85% + concurrentes
+
+### 🟡 Nivel 3
+
+- CI/CD
+- Escalabilidad horizontal
+- WebSockets (opcional)
+
+---
+
+## 🧠 Veredicto final
+
+👉 Si lo vendes hoy:
+
+- ✔ sirve para empresa pequeña/media
+- ⚠ requiere supervisión técnica
+
+👉 Si haces los ajustes:
+
+- 💼 puede convertirse en **producto SaaS real**
+
+---
+
+## Resumen Ejecutivo (Actualizado)
 
 | Aspecto | Estado | Prioridad |
 |---------|--------|-----------|
@@ -14,9 +294,16 @@
 | Logging de Auditoría | ✅ Implementado | - |
 | Paginación | ✅ Implementada | - |
 | Cacheo | ✅ Implementado | - |
-| Testing | ✅ 73% Coverage | - |
+| Testing | ✅ 73% Coverage | 🟡 Mejorar |
 | PWA | ✅ Implementado | - |
 | Export Excel | ✅ Disponible | - |
+| **Migraciones DB** | ❌ No implementado | 🔴 Alta |
+| **Backups automatizados** | ❌ No implementado | 🔴 Alta |
+| **Monitoreo** | ❌ No implementado | 🔴 Alta |
+| **Alertas** | ❌ No implementado | 🔴 Alta |
+| **Headers seguridad** | 🟡 Incompleto | 🟠 Media |
+| **Tests concurrentes** | ❌ No implementado | 🟠 Media |
+| **Redis cache** | ❌ No implementado | 🟠 Media |
 
 ---
 
@@ -26,15 +313,15 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      F1 COMEDOR                              │
+│                      F1 COMEDOR                             │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  ┌─────────────────┐    ┌─────────────────────────────┐    │
-│  │  Frontend       │    │  Backend (FastAPI)          │    │
-│  │  React + Vite   │◄──►│  - API REST                │    │
-│  │                 │    │  - JWT Auth                │    │
-│  │                 │    │  - QR Generator            │    │
-│  └─────────────────┘    └──────────────┬──────────────┘    │
+│  ┌─────────────────┐    ┌─────────────────────────────┐     │
+│  │  Frontend       │    │  Backend (FastAPI)          │     │
+│  │  React + Vite   │◄──►│  - API REST                 │     │
+│  │                 │    │  - JWT Auth                 │     │
+│  │                 │    │  - QR Generator             │     │
+│  └─────────────────┘    └──────────────┬──────────────┘     │
 │                                       │                     │
 │  ┌─────────────────┐                  │                     │
 │  │  PostgreSQL     │◄─────────────────┘                     │

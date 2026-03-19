@@ -4,9 +4,69 @@ Sistema de gestión de comedor empresarial con autenticación JWT, generación d
 
 ---
 
+## 📊 Auditoría del Proyecto
+
+| Área | Score |
+|------|-------|
+| Backend | 9/10 |
+| Frontend | 8.5/10 |
+| Seguridad | 7.5/10 |
+| Testing | 7/10 |
+| DevOps | 6.5/10 |
+| Escalabilidad | 6.5/10 |
+
+### ✅ Lo Que Hiciste Muy Bien
+- Auditoría real implementada
+- Rate limiting activo
+- Eliminación del bypass de emergencia
+- PWA incluida (poco común en MVPs)
+- QR con control de duplicados
+
+### 🚨 Problemas Críticos Identificados
+1. **Sin migraciones de DB** - Alembic configurado pero no usado completamente
+2. **Sin backups automatizados** de PostgreSQL
+3. **Sin monitoreo** (Prometheus/alerting)
+4. **Posibles race conditions** en escaneo QR simultáneo
+
+### 🎯 Veredicto Final
+- ✅ **Listo para**: Producción controlada / piloto interno
+- ❌ **No aún**: Producción crítica a gran escala
+
+---
+
+## 🛠️ Stack Tecnológico
+
+| Componente | Tecnología |
+|------------|------------|
+| **Backend** | FastAPI (Python) |
+| **Frontend** | React 18 + Vite |
+| **Base de Datos** | PostgreSQL |
+| **Contenedores** | Docker + Docker Compose |
+| **Autenticación** | JWT + bcrypt |
+| **UI** | TailwindCSS + PWA |
+
+---
+
+## ✅ Funcionalidades Implementadas
+
+| Módulo | Estado |
+|--------|--------|
+| Autenticación JWT + Refresh Tokens | ✅ |
+| Gestión Empleados + QR único | ✅ |
+| Escaneo QR + prevención duplicados | ✅ |
+| Consumos + límites diarios | ✅ |
+| Reportes + exportación Excel | ✅ |
+| Empresas y Categorías | ✅ |
+| Rate Limiting | ✅ |
+| Logging de Auditoría | ✅ |
+| PWA | ✅ |
+| Docker multi-container | ✅ |
+
+---
+
 ## ⚠️ Modo Estricto - Importante
 
-**Todo el proyecto debe ejecutarse exclusivamente desde dentro de esta carpeta (`c:\\Users\\Mao\\OneDrive\\Documentos\\GProA Desarrollo\\Desarrollo_F1\\f1-comedor`).**  
+**Todo el proyecto debe ejecutarse exclusivamente desde dentro de esta carpeta.**  
 No se debe usar ni generar nada fuera de esta carpeta. Todos los comandos, entornos virtuales, Docker y archivos están contenidos aquí.
 
 ---
@@ -24,8 +84,8 @@ Los servicios se comunican entre sí a través de la red interna de Docker.
 ### Opción 1: Arrancar todo con Docker Compose (recomendado)
 
 ```bash
-# Asegúrate de estar en el directorio principal del proyecto:
-cd "c:\\Users\\Mao\\OneDrive\\Documentos\\GProA Desarrollo\\Desarrollo_F1\\f1-comedor"
+# Asegúrate de estar en el directorio principal del proyecto
+cd "C:\Users\X1\OneDrive\Documentos\Python_VS Code\GProA\GProA_F1\f1-comeror_1\GProA Desarrollo\Desarrollo_F1\f1-comedor"
 
 # (opcional) crear red compartida si aún no existe
 docker network create f1-comedor-network 2>/dev/null || true
@@ -38,7 +98,6 @@ echo "esperando que la base de datos esté lista..." && sleep 15
 
 # comprobar que los contenedores estén en buen estado
 docker-compose ps
-# debería verse: db (healthy), app (healthy), frontend (running)
 
 # cargar datos de prueba (único uso o después de borrar la BD)
 docker-compose exec app python -m app.seed
@@ -51,7 +110,7 @@ docker-compose exec app python -m app.seed
 
 ```bash
 # Cambia al directorio del frontend
-cd "c:\\Users\\Mao\\OneDrive\\Documentos\\GProA Desarrollo\\Desarrollo_F1\\f1-comedor\\frontend"
+cd "C:\Users\X1\OneDrive\Documentos\Python_VS Code\GProA\GProA_F1\f1-comeror_1\GProA Desarrollo\Desarrollo_F1\f1-comedor\frontend"
 npm install
 npm run dev
 ```
@@ -59,32 +118,16 @@ npm run dev
 *En este caso deberás apuntar `VITE_API_URL` a `http://localhost:8000` porque
 la API estará corriendo en tu máquina, no en Docker.*
 
-> 💡 **Nota para entornos remotos (Codespaces/GitHub.dev)**
-> 
-> - El navegador que utiliza GitHub.dev/Codespaces no forma parte de la red de
->   Docker. Por eso `http://app:8000` no es accesible desde el lado del cliente.
-> - Con la versión actual del frontend no necesitas tocar nada: el valor por
->   defecto de `VITE_API_URL` es vacío, y el cliente hace las peticiones a
->   rutas relativas (`/api/...`). El servidor de desarrollo de Vite, que sí
->   corre dentro del contenedor, *proxía* esas rutas a `http://localhost:8000`.
-> - Si prefieres definirlo manualmente, usa la URL pública que GitHub te da para
->   el puerto 8000 (algo como `https://<workspace>-8000.github.dev`).
-
-Esta flexibilidad asegura que la aplicación funcionará tanto en tu máquina
-local como dentro de un Codespace remoto.
-
-
-
 ### Opción 3: Solo API (desarrollo local)
 
 ```bash
-# Asegúrate de estar en el directorio principal del proyecto:
-cd "c:\\Users\\Mao\\OneDrive\\Documentos\\GProA Desarrollo\\Desarrollo_F1\\f1-comedor"
+# Asegúrate de estar en el directorio principal del proyecto
+cd "C:\Users\X1\OneDrive\Documentos\Python_VS Code\GProA\GProA_F1\f1-comeror_1\GProA Desarrollo\Desarrollo_F1\f1-comedor"
 python -m venv .venv
-source .venv/bin/activate
+.venv\Scripts\activate
 pip install -r requirements.txt
-export DATABASE_URL="postgresql://f1comedor:f1comedor123@localhost:5432/f1comedor"
-export SECRET_KEY="your-secret-key"
+set DATABASE_URL="postgresql://f1comedor:f1comedor123@localhost:5432/f1comedor"
+set SECRET_KEY="your-secret-key"
 python -m app.seed
 uvicorn app.main:app --reload
 ```
@@ -99,6 +142,7 @@ Después de ejecutar el seed:
 | Supervisor | supervisor  | supervisor123  |
 | Cajero     | cajero      | cajero123      |
 
+---
 
 ## ⚠️ Problemas comunes al iniciar
 
@@ -120,7 +164,7 @@ Después de ejecutar el seed:
      ocurre reinicia el contenedor del app:
      ```bash
 docker-compose restart app
-```  
+```
    * También puedes ver los logs con
      `docker-compose logs db` y `docker-compose logs app`.
 
@@ -128,17 +172,12 @@ docker-compose restart app
    * Ejecuta `docker-compose down -v` para borrar el volumen y vuelve a ejecutar 
      el seed.
 
-5. **No puedes acceder al panel principal después del login (Bypass de emergencia)**
-   * Si tienes problemas de autenticación, hay un bypass temporal disponible:
-   * En la página de login, haz clic en el botón **"🔓 Acceso Directo (Bypass)"**
-   * Esto te permitirá entrar como usuario ADMIN sin necesidad de credenciales válidas
-   * El bypass funciona buscando un usuario existente en la base de datos
-   * **Nota:** Este bypass es solo para desarrollo/pruebas. No usarlo en producción.
+---
 
 ## Estructura del proyecto
 
 ```
-c:\\Users\\Mao\\OneDrive\\Documentos\\GProA Desarrollo\\Desarrollo_F1\\f1-comedor\\
+f1-comeror_1/
 ├── app/                    # Backend (FastAPI)
 │   ├── api/               # Endpoints de la API
 │   ├── models/            # Modelos SQLAlchemy
@@ -159,9 +198,11 @@ c:\\Users\\Mao\\OneDrive\\Documentos\\GProA Desarrollo\\Desarrollo_F1\\f1-comedo
 │   └── .env.example
 ├── docker-compose.yml     # Orquestación de servicios
 ├── Dockerfile             # Imagen de la API
+├── alembic.ini            # Migraciones configuradas
 └── requirements.txt       # Dependencias Python
 ```
 
+---
 
 ## Endpoints API (ejemplos)
 
@@ -183,16 +224,18 @@ curl -X POST http://localhost:8000/api/auth/refresh \
 README para mantenerlo legible; todos están definidos en la documentación de
 Swagger (`/docs`).)
 
+---
 
 ## 🧪 Pruebas
 
 ```bash
-# Asegúrate de estar en el directorio principal del proyecto:
-cd "c:\\Users\\Mao\\OneDrive\\Documentos\\GProA Desarrollo\\Desarrollo_F1\\f1-comedor"
+# Asegúrate de estar en el directorio principal del proyecto
+cd "C:\Users\X1\OneDrive\Documentos\Python_VS Code\GProA\GProA_F1\f1-comeror_1\GProA Desarrollo\Desarrollo_F1\f1-comedor"
 pytest
 pytest --cov=app --cov-report=html
 ```
 
+---
 
 ## ⚙️ Variables de entorno
 
@@ -203,7 +246,7 @@ pytest --cov=app --cov-report=html
 | DATABASE_URL              | postgresql://f1comedor:...         | URL de la base de datos         |
 | SECRET_KEY                | your-secret-key                    | Clave para JWT                  |
 | ACCESS_TOKEN_EXPIRE_MINUTES | 30                               | Expiración token de acceso      |
-| DUPLICATE_SCAN_MINUTES    | 5                                  | Ventana para evitar escaneos dobles |
+| DUPLICATE_SCAN_MINUTES    | 5                                  | Ventana para evitar escaneos doubles |
 
 **Frontend**
 
@@ -211,6 +254,7 @@ pytest --cov=app --cov-report=html
 |---------------|-----------------------|--------------------|
 | VITE_API_URL  | http://localhost:8000 | URL de la API      |
 
+---
 
 ## 🔄 QR Modular
 
@@ -218,6 +262,7 @@ El servicio de QR está en `app/core/qr_service.py`. Utiliza la librería
 `qrcode` internamente, pero puede sustituirse por un proveedor externo
 implementando `QRProviderInterface`.
 
+---
 
 ## 📝 Licencia
 
