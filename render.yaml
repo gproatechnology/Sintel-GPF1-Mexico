@@ -1,0 +1,33 @@
+# render.yaml - Auto-deploy configuration for Render
+# https://render.com/docs/yaml
+
+services:
+  # Frontend + API (Web Service)
+  - type: web
+    name: f1-comedor
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerComposePath: ./docker-compose.production.yml
+    region: oregon
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "https://f1-comedor.onrender.com"
+      - key: VITE_API_URL
+        value: "https://f1-comedor.onrender.com"
+      - key: DOMAIN
+        value: "f1-comedor.onrender.com"
+      - key: WWW_DOMAIN
+        value: "www.f1-comedor.onrender.com"
+
+# PostgreSQL Database (Render managed)
+databases:
+  - name: f1comedor
+    region: oregon
+    plan: free
+    postgresMajorVersion: "15"
