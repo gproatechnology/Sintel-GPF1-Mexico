@@ -63,9 +63,43 @@ limiter = Limiter(key_func=get_remote_address)
 
 # Create FastAPI application
 app = FastAPI(
-    title=settings.APP_NAME,
-    version=settings.APP_VERSION,
-    description="F1 Comedor - Restaurant Management System API"
+    title="F1 Comedor API",
+    version="1.0.0",
+    description="""
+# F1 Comedor - Restaurant Management System API
+
+## Características
+
+- **Autenticación JWT** con Access y Refresh Tokens
+- **Gestión de Empresas** - CRUD completo
+- **Gestión de Empleados** - CRUD + Códigos QR
+- **Registro de Consumos** - Desayuno, Comida, Cena
+- **Reportes** - Por empresa, categoría, empleado
+- **Dashboard** - Estadísticas en tiempo real
+- **WebSocket** - Actualizaciones en vivo
+
+## Roles de Usuario
+
+- **ADMIN**: Acceso completo al sistema
+- **SUPERVISOR**: Monitoreo y reportes
+- **CASHIER**: Registro de consumos
+- **EMPLOYEE**: Ver propios consumos
+
+## Tech Stack
+
+- FastAPI (Python 3.11)
+- PostgreSQL 15
+- React + Vite
+- Docker
+
+## Documentación
+
+- Swagger UI: `/docs`
+- ReDoc: `/redoc`
+""",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
 )
 
 # Add rate limiter to app state
