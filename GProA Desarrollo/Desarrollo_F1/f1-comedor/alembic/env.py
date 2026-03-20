@@ -6,7 +6,7 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 
 # Import all models to ensure they are registered
-from app.models import company, category, employee, menu_item, consumption, user
+from app.models import company, category, employee, menu_item, consumption, user, user_settings
 
 # Import database base
 from app.db.base import Base

@@ -1,18 +1,18 @@
 """Employee schemas"""
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from datetime import datetime
 from typing import Optional
 
 
 # Employee schemas
 class EmployeeBase(BaseModel):
-    employee_number: str
-    first_name: str
-    last_name: str
-    company_id: int
-    category_id: int
-    email: Optional[EmailStr] = None
-    phone: Optional[str] = None
+    employee_number: str = Field(..., json_schema_extra={"example": "EMP001"})
+    first_name: str = Field(..., json_schema_extra={"example": "Juan"})
+    last_name: str = Field(..., json_schema_extra={"example": "Pérez"})
+    company_id: int = Field(..., json_schema_extra={"example": 1})
+    category_id: int = Field(..., json_schema_extra={"example": 1})
+    email: Optional[EmailStr] = Field(None, json_schema_extra={"example": "juan.perez@empresa.com"})
+    phone: Optional[str] = Field(None, json_schema_extra={"example": "+52 55 1234 5678"})
 
 
 class EmployeeCreate(EmployeeBase):
@@ -20,21 +20,21 @@ class EmployeeCreate(EmployeeBase):
 
 
 class EmployeeUpdate(BaseModel):
-    employee_number: Optional[str] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    company_id: Optional[int] = None
-    category_id: Optional[int] = None
-    email: Optional[EmailStr] = None
-    phone: Optional[str] = None
-    is_active: Optional[bool] = None
+    employee_number: Optional[str] = Field(None, json_schema_extra={"example": "EMP001"})
+    first_name: Optional[str] = Field(None, json_schema_extra={"example": "Juan"})
+    last_name: Optional[str] = Field(None, json_schema_extra={"example": "Pérez"})
+    company_id: Optional[int] = Field(None, json_schema_extra={"example": 1})
+    category_id: Optional[int] = Field(None, json_schema_extra={"example": 1})
+    email: Optional[EmailStr] = Field(None, json_schema_extra={"example": "juan.perez@empresa.com"})
+    phone: Optional[str] = Field(None, json_schema_extra={"example": "+52 55 1234 5678"})
+    is_active: Optional[bool] = Field(None, json_schema_extra={"example": True})
 
 
 class EmployeeResponse(EmployeeBase):
-    id: int
-    qr_code: str
-    is_active: bool
-    created_at: datetime
+    id: int = Field(..., json_schema_extra={"example": 1})
+    qr_code: str = Field(..., json_schema_extra={"example": "QR_EMP001_2024"})
+    is_active: bool = Field(..., json_schema_extra={"example": True})
+    created_at: datetime = Field(..., json_schema_extra={"example": "2024-01-15T10:30:00"})
 
     model_config = ConfigDict(from_attributes=True)
 

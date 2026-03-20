@@ -171,4 +171,11 @@ export const reportsAPI = {
   }),
 }
 
+// Settings API
+export const settingsAPI = {
+  get: () => api.get('/api/settings'),
+  update: (data) => api.put('/api/settings', data),
+  updateDashboardLayout: (layout) => api.patch('/api/settings/dashboard/layout', layout),
+}
+
 export default api

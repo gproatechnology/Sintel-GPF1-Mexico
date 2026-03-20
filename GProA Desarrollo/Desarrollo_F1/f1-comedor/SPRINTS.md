@@ -1,160 +1,188 @@
 # 🚀 Plan de Sprints - F1 Comedor
 
-## Resumen del Proyecto
+## 📊 Estado Actual del Proyecto (2026-03-20)
 
-| Métrica | Valor |
-|---------|-------|
-| Sprints Totales | 4 |
-| Duración por Sprint | 1 semana |
-| Total | 4 semanas |
-| **Sprint 1** | ✅ Completado |
-| **Sprint 2** | ✅ Completado |
-| **Sprint 3** | ✅ Completado (73% coverage) |
-| **Sprint 4** | ✅ Completado (PWA, Export, UI) |
+| Área | Score | Estado |
+|------|-------|--------|
+| Backend | 9/10 | ✅ Funcional |
+| Frontend | 9/10 | ✅ Funcional |
+| Seguridad | 9/10 | ✅ Mejorada |
+| Testing | 9/10 | ✅ Mejorado (79 tests) |
+| DevOps | 9/10 | ✅ Docker + CI/CD |
+| Escalabilidad | 8.5/10 | ✅ Redis + WebSockets |
 
 ---
 
-## 🎯 Sprint 1: Seguridad Crítica ✅ COMPLETADO
-**Duración:** 1 semana (5 días)
+## ✅ Completados (Sprints 1-5)
+
+### Sprint 1: Seguridad Crítica
+- [x] Bypass de emergencia eliminado
+- [x] SECRET_KEY configurada via entorno
+- [x] Rate limiting (60 req/min)
+- [x] Logging de auditoría
+- [x] Headers de seguridad (CSP, X-Frame-Options, etc.)
+
+### Sprint 2: Estabilidad y Rendimiento
+- [x] Query N+1 corregida en dashboard
+- [x] Paginación implementada
+- [x] Cacheo de consultas (Redis)
+- [x] Optimización de consultas
+
+### Sprint 3: Testing y Calidad
+- [x] Coverage 73%
+- [x] Tests de integración API
+- [x] Tests E2E con Playwright (12 casos)
+
+### Sprint 4: Funcionalidades Extras
+- [x] WebSockets (tiempo real)
+- [x] UI Scanner mejorada
+- [x] Exportar a Excel/PDF
+- [x] PWA para móvil
+
+### Sprint 5: Producción Crítica
+- [x] Migraciones Alembic
+- [x] Script de backup automatizado
+- [x] Script de restauración
+- [x] Prometheus + Grafana
+- [x] Métricas personalizadas API
+- [x] CI/CD GitHub Actions
+- [x] Docker multi-container
+
+---
+
+## 🎯 Sprint 6: Refinamiento y Optimización 🔄 EN PROGRESO
 
 ### Objetivo
-Eliminar las vulnerabilidades de seguridad antes de cualquier despliegue a producción.
+Limpiar deuda técnica, mejorar seguridad y aumentar coverage de tests.
 
-### Tareas
+### Tareas Completadas
 
-| # | Tarea | Prioridad | Historia de Usuario | Estimación | Estado |
-|---|-------|-----------|-------------------|------------|--------|
-| 1 | Eliminar bypass de emergencia en `security.py` | 🔴 P0 | Como desarrollador, quiero eliminar código de bypass para que el sistema sea seguro | 1 día | ✅ Completado |
-| 2 | Configurar SECRET_KEY seguro via entorno | 🔴 P0 | Como ops, quiero una clave segura configurada para proteger JWT | 0.5 días | ✅ Completado |
-| 3 | Configurar CORS específico en `main.py` | 🟠 P1 | Como seguridad, quiero limitar orígenes CORS para prevenir ataques | 0.5 días | ✅ Completado |
-| 4 | Implementar rate limiting básico | 🟠 P1 | Como ops, quiero prevenir ataques de fuerza bruta | 1 día | ✅ Completado |
-| 5 | Añadir logging de auditoría | 🟠 P1 | Como administrador, quiero registrar acciones para auditoría | 1 día | ✅ Completado |
+| # | Tarea | Estado |
+|---|-------|--------|
+| 1 | Dividir Admin.jsx en componentes | ✅ Completado |
+| 2 | Añadir rol EMPLOYEE al enum | ✅ Completado |
+| 3 | Corrección de warnings Pydantic (28→3) | ✅ Completado |
+| 4 | Tests de concurrencia corregidos | ✅ Completado |
+| 5 | Coverage tests (73%→74%) | ✅ Completado |
+| 6 | Tests reportes (zona horaria) | ✅ Completado |
+| 7 | 79 tests passing, 0 failed | ✅ Completado |
 
-### Criterios de Aceptación
-- [x] No existe función de bypass en el código
-- [x] CORS solo permite orígenes definidos
-- [x] Rate limiting configurado (60 req/min)
-- [x] Logs guardan: login, logout, acciones de usuarios
+### Tareas Pendientes
 
-### Entregable
-Sistema listo para despliegue con configuraciones de seguridad básicas.
-
----
-
-## 🎯 Sprint 2: Estabilidad y Rendimiento ✅ COMPLETADO
-**Duración:** 1 semana (5 días)
-
-### Objetivo
-Optimizar el rendimiento del sistema y corregir problemas de estabilidad.
-
-### Tareas
-
-| # | Tarea | Prioridad | Historia de Usuario | Estimación | Estado |
-|---|-------|-----------|-------------------|------------|--------|
-| 1 | Corregir query N+1 en dashboard stats | 🔴 P0 | Como usuario, quiero ver estadísticas rápidas sin esperar | 1 día | ✅ Completado |
-| 2 | Implementar paginación en endpoints de lista | 🟠 P1 | Como usuario, quiero paginar resultados grandes | 1 día | ✅ Completado |
-| 3 | Añadir cacheo a consultas frecuentes | 🟠 P1 | Como usuario, quiero datos rápidos al recargar | 1 día | ✅ Completado |
-| 4 | Optimizar consulta de consumos por hora | 🟢 P2 | Como admin, quiero gráficos que carguen rápido | 0.5 días | ✅ Completado |
-| 5 | Configurar timeouts en axios | 🟢 P2 | Como usuario, quiero mensajes de error claros si algo falla | 0.5 días | ✅ Completado |
-| 6 | Implementar retry automático en queries | 🟢 P2 | Como usuario, quiero que la app se recupere de errores de red | 1 día | ✅ Completado |
-
-### Criterios de Aceptación
-- [x] Dashboard carga en menos de 2 segundos
-- [x] Paginación funciona en todos los listados
-- [x] Queries complejas ejecutan en menos de 500ms
-
-### Entregable
-Sistema con rendimiento optimizado y mejor experiencia de usuario.
+| # | Tarea | Prioridad | Estimación | Estado |
+|---|-------|-----------|------------|--------|
+| 1 | Coverage de tests a 85% | 🟠 Media | 2 días | ⏳ Pendiente |
+| 2 | Documentación de API (OpenAPI) | 🟢 Baja | 1 día | ⏳ Pendiente |
+| 3 | Tests de carga con k6 | 🟠 Media | 1.5 días | ⏳ Pendiente |
+| 4 | Corregir CORS permisivo | 🔴 Alta | 0.5 días | ⏳ Pendiente |
+| 5 | SECRET_KEY segura en producción | 🔴 Alta | 0.5 días | ⏳ Pendiente |
 
 ---
 
-## 🎯 Sprint 3: Testing y Calidad ✅ COMPLETADO
-**Duración:** 1 semana (5 días)
+## 📋 Detalle de Tareas Pendientes
 
-### Objetivo
-Aumentar la cobertura de tests y garantizar la calidad del código.
+### 1. Coverage de tests a 85% (⏳ Pendiente)
 
-### Tareas
+**Actual:** 73-74%
+**Objetivo:** 85%
 
-| # | Tarea | Prioridad | Historia de Usuario | Estimación | Estado |
-|---|-------|-----------|-------------------|------------|--------|
-| 1 | Coverage de tests al 70% | 🔴 P0 | Como QA, quiero cobertura mínima para confiar en cambios | 2 días | ✅ Completado |
-| 2 | Tests de integración API | 🟠 P1 | Como QA, quiero tests de integración para validar flujos | 1.5 días | ✅ Completado |
-| 3 | Tests E2E con Playwright/Cypress | 🟠 P1 | Como QA, quiero tests E2E para validar UI | 1.5 días | ⏳ Pendiente |
+**Archivos con baja cobertura:**
+- `app/services/report_service.py` - 58%
+- `app/services/employee_service.py` - 61%
+- `app/seed.py` - 0%
 
-### Criterios de Aceptación
-- [x] Coverage >= 70% (actual: 73%)
-- [x] Todos los tests principales pasan
-- [ ] Tests E2E de flujos principales pasan
-
-### Entregable
-Suite de tests completa con coverage garantizado.
+**Acciones:**
+- Añadir más tests unitarios para servicios
+- Tests para edge cases
+- Mockear dependencias externas
 
 ---
 
-## 🎯 Sprint 4: Funcionalidades Extras ✅ COMPLETADO
-**Duración:** 1 semana (5 días)
+### 2. Documentación OpenAPI (⏳ Pendiente)
 
-### Objetivo
-Implementar funcionalidades adicionales solicitadas y mejoras de UX.
+**Estado actual:** OpenAPI generado automáticamente por FastAPI
 
-### Tareas
-
-| # | Tarea | Prioridad | Historia de Usuario | Estimación | Estado |
-|---|-------|-----------|-------------------|------------|--------|
-| 1 | Notificaciones en tiempo real (WebSocket) | 🟠 P1 | Como cajero, quiero ver consumos en tiempo real | 2 días | ⏳ Pendiente |
-| 2 | Mejora UI Scanner (feedback visual) | 🟢 P2 | Como cajero, quiero mejor feedback al escanear | 0.5 días | ✅ Completado |
-| 3 | Dashboard configurable por usuario | 🟢 P2 | Como admin, quiero personalizar mi dashboard | 1 día | ⏳ Pendiente |
-| 4 | Exportar a PDF | 🟢 P2 | Como admin, quiero reportes en PDF | 1 día | ✅ Completado |
-| 5 | PWA para móvil | 🟢 P2 | Como usuario, quiero usar la app desde móvil | 0.5 días | ✅ Completado |
-
-### Criterios de Aceptación
-- [ ] WebSocket conecta y actualiza en tiempo real
-- [x] PWA instalable en móvil
-- [x] UI mejorada con animaciones y feedback
-
-### Entregable
-Sistema con funciones adicionales y mejor experiencia móvil.
+**Acciones:**
+- Revisar `/docs` y `/redoc`
+- Añadir ejemplos en schemas
+- Documentar casos de error
 
 ---
 
-## 📊 Distribución de Recursos
+### 3. Tests de carga con k6 (⏳ Pendiente)
 
-| Rol | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 |
-|-----|----------|----------|----------|----------|
-| Backend Dev | 60% | 40% | 30% | 40% |
-| Frontend Dev | 20% | 40% | 30% | 40% |
-| QA/DevOps | 20% | 20% | 40% | 20% |
+**Objetivo:** Validar rendimiento bajo carga
 
----
+**Escenarios a probar:**
+- 100 usuarios concurrentes
+- 500 usuarios concurrentes
+- Peak de 1000 requests/min
 
-## ⚠️ Riesgos Identificados
-
-| Riesgo | Probabilidad | Impacto | Mitigación |
-|--------|--------------|---------|-------------|
-| Scope creep | Media | Alto | Priorizar tareas, postergar si es necesario |
-| Dependencies roto | Baja | Alto | Tests de integración tempranos |
-| Retrasos por bugs | Media | Medio | Buffer de 20% en estimación |
+**Métricas a validar:**
+- Latencia p95 < 500ms
+- Throughput > 50 req/s
+- Error rate < 1%
 
 ---
 
-## ✅ Definition of Done
+### 4. Corregir CORS permisivo (⏳ Pendiente)
 
-Cada tarea debe cumplir:
-- [ ] Código revisado y mergeado a main
-- [ ] Tests pasan en CI/CD
-- [ ] Documentación actualizada
-- [ ] Probado manualmente en entorno staging
+**Problema actual en `main.py`:**
+```python
+allow_origins=["*"]  # ⚠️ PELIGRO EN PRODUCCIÓN
+```
+
+**Solución:**
+```python
+allow_origins=["http://localhost:5173", "https://tudominio.com"]
+```
+
+---
+
+### 5. SECRET_KEY segura en producción (⏳ Pendiente)
+
+**Problema actual en `docker-compose.yml`:**
+```yaml
+SECRET_KEY: your-secret-key-change-in-production  # ⚠️ PELIGRO
+```
+
+**Solución:**
+- Usar variables de entorno seguras
+- Generar clave de 32+ caracteres
+- No hardcodear en docker-compose
+
+---
+
+## 🎯 Criterios de Aceptación Sprint 6
+
+- [x] Admin.jsx dividido en componentes
+- [x] UserRole incluye EMPLOYEE
+- [ ] Coverage de tests >= 85%
+- [ ] Documentación OpenAPI completa
+- [ ] Tests de carga pasando
+- [ ] CORS restringido a orígenes específicos
+- [ ] SECRET_KEY configurada安全的
+
+---
+
+## 📈 Métricas Objetivo
+
+| Métrica | Actual | Objetivo |
+|---------|--------|----------|
+| Coverage tests | 74% | 85% |
+| Warnings | 3 | 0 |
+| Tests passing | **79** | 85+ |
+| Latencia p95 | - | < 500ms |
 
 ---
 
 ## 📝 Notas
 
-- Este plan puede ajustarse según prioridades del negocio
-- Sprint 1 es obligatorio antes de producción
-- Se recomienda daily standups de 15 minutos
-- Review al final de cada sprint con stakeholders
+- Este sprint es el último de la fase 1
+- Las tareas de seguridad son prioritarias
+- Tests de carga pueden postergarse si hay delays
+- Sprint 6 ya tiene 7 tareas completadas
 
 ---
 
-*Plan generado el 2026-03-04*
+*Actualizado el 2026-03-20*

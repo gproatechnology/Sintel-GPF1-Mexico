@@ -1,6 +1,6 @@
 """API routers"""
 from fastapi import APIRouter
-from app.api import auth, companies, categories, employees, menu_items, consumptions, reports
+from app.api import auth, companies, categories, employees, menu_items, consumptions, reports, settings
 
 api_router = APIRouter(prefix="/api")
 
@@ -12,3 +12,4 @@ api_router.include_router(employees.router)
 api_router.include_router(menu_items.router)
 api_router.include_router(consumptions.router)
 api_router.include_router(reports.router)
+api_router.include_router(settings.router)

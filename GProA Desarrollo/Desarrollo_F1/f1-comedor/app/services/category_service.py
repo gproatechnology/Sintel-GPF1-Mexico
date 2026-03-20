@@ -62,12 +62,13 @@ def update_category(
     return category
 
 
-def delete_category(db: Session, category_id: int) -> bool:
+def delete_category(db: Session, category_id: int) -> Optional[Category]:
     """Soft delete a category (set is_active to False)"""
     category = get_category(db, category_id)
     if not category:
-        return False
+        return None
     
     category.is_active = False
     db.commit()
-    return True
+    db.refresh(category)
+    return category

@@ -1,6 +1,6 @@
 """Tests for consumptions API"""
 import pytest
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from decimal import Decimal
 
 from app.models.consumption import Consumption, MealType
@@ -51,8 +51,9 @@ class TestGetConsumptions:
             id=1,
             employee_id=1,
             meal_type=MealType.LUNCH,
+            items=[{"name": "Pizza", "price": 25.50}],
             total_amount=Decimal("25.50"),
-            consumed_at=datetime.now(),
+            consumed_at=datetime.now(timezone.utc),
             registered_by=1
         )
         db_session.add(consumption)
@@ -82,7 +83,8 @@ class TestGetConsumptions:
         
         consumption = Consumption(
             id=1, employee_id=1, meal_type=MealType.LUNCH,
-            total_amount=Decimal("25.00"), consumed_at=datetime.now(), registered_by=1
+            items=[{"name": "Item", "price": 25.00}],
+            total_amount=Decimal("25.00"), consumed_at=datetime.now(timezone.utc), registered_by=1
         )
         db_session.add(consumption)
         db_session.commit()
@@ -123,7 +125,7 @@ class TestCreateConsumption:
         consumption_data = ConsumptionCreate(
             employee_id=1,
             meal_type=MealType.LUNCH,
-            items=[{"name": "Pizza", "price": "10.00"}],
+            items=[{"menu_item_id": 1, "name": "Pizza", "price": "10.00", "quantity": 1}],
             total_amount=Decimal("10.00")
         )
         
@@ -154,7 +156,7 @@ class TestCheckDuplicateScan:
         
         result = check_duplicate_scan(db_session, employee.id, MealType.LUNCH)
         
-        assert result == False
+        assert result is None
     
     def test_duplicate_exists(self, db_session):
         """Test duplicate scan exists"""
@@ -173,11 +175,12 @@ class TestCheckDuplicateScan:
         # Create recent consumption
         consumption = Consumption(
             employee_id=1, meal_type=MealType.LUNCH,
-            total_amount=Decimal("10.00"), consumed_at=datetime.now(), registered_by=1
+            items=[{"menu_item_id": 1, "name": "Item", "price": 10.00, "quantity": 1}],
+            total_amount=Decimal("10.00"), consumed_at=datetime.now(timezone.utc), registered_by=1
         )
         db_session.add(consumption)
         db_session.commit()
         
         result = check_duplicate_scan(db_session, employee.id, MealType.LUNCH)
         
-        assert result == True
+        assert result is not None

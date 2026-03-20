@@ -5,6 +5,7 @@ from app.models.employee import Employee
 from app.models.menu_item import MenuItem, MealType
 from app.models.consumption import Consumption, MealType as ConsumptionMealType
 from app.models.user import User, UserRole
+from app.models.user_settings import UserSettings
 
 __all__ = [
     "Company",
@@ -14,5 +15,6 @@ __all__ = [
     "Consumption",
     "User",
     "UserRole",
+    "UserSettings",
     "MealType",
 ]

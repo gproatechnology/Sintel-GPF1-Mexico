@@ -61,12 +61,13 @@ def update_menu_item(
     return menu_item
 
 
-def delete_menu_item(db: Session, menu_item_id: int) -> bool:
+def delete_menu_item(db: Session, menu_item_id: int) -> Optional[MenuItem]:
     """Soft delete a menu item (set is_active to False)"""
     menu_item = get_menu_item(db, menu_item_id)
     if not menu_item:
-        return False
+        return None
     
     menu_item.is_active = False
     db.commit()
-    return True
+    db.refresh(menu_item)
+    return menu_item

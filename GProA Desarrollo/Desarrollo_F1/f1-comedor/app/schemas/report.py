@@ -17,6 +17,7 @@ class ReportByCompanyResponse(BaseModel):
     date_from: date
     date_to: date
     companies: list[ReportByCompany]
+    total_companies: int
     grand_total_consumptions: int
     grand_total_amount: Decimal
 
@@ -33,6 +34,7 @@ class ReportByCategoryResponse(BaseModel):
     date_from: date
     date_to: date
     categories: list[ReportByCategory]
+    total_categories: int
     grand_total_consumptions: int
     grand_total_amount: Decimal
 

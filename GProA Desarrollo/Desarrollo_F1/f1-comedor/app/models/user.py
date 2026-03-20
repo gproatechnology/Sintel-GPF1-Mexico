@@ -10,6 +10,7 @@ class UserRole(str, enum.Enum):
     ADMIN = "ADMIN"
     SUPERVISOR = "SUPERVISOR"
     CASHIER = "CASHIER"
+    EMPLOYEE = "EMPLOYEE"
 
 
 class User(Base):
@@ -25,3 +26,4 @@ class User(Base):
 
     # Relationships
     consumptions = relationship("Consumption", back_populates="user")
+    settings = relationship("UserSettings", back_populates="user", uselist=False)

@@ -18,15 +18,32 @@ services:
       retries: 5
       start_period: 10s
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - f1-comedor-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - redis_data:/data
+
   app:
     build: .
     ports:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://f1comedor:f1comedor123@db:5432/f1comedor
+      REDIS_URL: redis://redis:6379/0
       SECRET_KEY: your-secret-key-change-in-production
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     volumes:
       - .:/app
@@ -59,3 +76,4 @@ networks:
 
 volumes:
   postgres_data:
+  redis_data:

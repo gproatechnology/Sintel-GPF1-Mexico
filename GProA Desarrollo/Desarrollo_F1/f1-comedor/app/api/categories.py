@@ -77,7 +77,7 @@ def delete_category(
     current_user: User = Depends(get_current_user)
 ):
     """Soft delete a category"""
-    success = category_service.delete_category(db, category_id)
-    if not success:
+    category = category_service.delete_category(db, category_id)
+    if category is None:
         raise HTTPException(status_code=404, detail="Category not found")
     return None

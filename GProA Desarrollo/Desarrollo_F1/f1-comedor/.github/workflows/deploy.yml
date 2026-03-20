@@ -1,0 +1,42 @@
+name: CD - Deploy to Render
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          # Install render CLI
+          npm install -g @render-dev/render-cli
+          
+          # Deploy (manual trigger or auto)
+          render deploy --service-id $RENDER_SERVICE_ID --api-key $RENDER_API_KEY
+          
+      - name: Run smoke tests
+        env:
+          API_URL: ${{ secrets.API_URL }}
+        run: |
+          sleep 30  # Wait for deployment
+          curl -f $API_URL/health || exit 1
+          curl -f $API_URL/api/companies || exit 1
+          
+      - name: Notify on failure
+        if: failure()
+        uses: slack-notify-action@v1
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

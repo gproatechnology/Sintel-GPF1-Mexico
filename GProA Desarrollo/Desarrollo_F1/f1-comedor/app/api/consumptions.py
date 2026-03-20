@@ -1,5 +1,6 @@
 """Consumptions router"""
-from fastapi import APIRouter, Depends, HTTPException, status
+import asyncio
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from typing import Optional
 from datetime import datetime
@@ -68,6 +69,7 @@ def get_consumption(
 @router.post("", response_model=ConsumptionResponse, status_code=status.HTTP_201_CREATED)
 def create_consumption(
     consumption_data: ConsumptionCreate,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -99,4 +101,20 @@ def create_consumption(
         consumption_data,
         registered_by=current_user.id
     )
+    
+    # Broadcast to WebSocket clients
+    try:
+        ws_manager = request.app.state.ws_manager
+        consumption_data_ws = {
+            "id": consumption.id,
+            "employee_id": consumption.employee_id,
+            "meal_type": consumption.meal_type,
+            "total_amount": float(consumption.total_amount),
+            "registered_by": consumption.registered_by,
+            "created_at": consumption.created_at.isoformat() if consumption.created_at else None
+        }
+        asyncio.create_task(ws_manager.broadcast_consumption(consumption_data_ws))
+    except Exception:
+        pass  # WebSocket is optional, don't fail if not available
+    
     return consumption

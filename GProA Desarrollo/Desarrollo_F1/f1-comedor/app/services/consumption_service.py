@@ -1,7 +1,7 @@
 """Consumption service"""
 from sqlalchemy.orm import Session
 from typing import Optional, List
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, UTC
 from decimal import Decimal
 
 from app.models.consumption import Consumption
@@ -69,7 +69,7 @@ def check_duplicate_scan(
     if minutes is None:
         minutes = settings.DUPLICATE_SCAN_MINUTES
     
-    time_threshold = datetime.utcnow() - timedelta(minutes=minutes)
+    time_threshold = datetime.now(UTC) - timedelta(minutes=minutes)
     
     consumption = db.query(Consumption).filter(
         Consumption.employee_id == employee_id,

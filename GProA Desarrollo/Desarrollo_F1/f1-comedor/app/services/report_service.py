@@ -70,6 +70,7 @@ def get_report_by_company(
         date_from=date_from,
         date_to=date_to,
         companies=companies,
+        total_companies=len(companies),
         grand_total_consumptions=grand_total_consumptions,
         grand_total_amount=grand_total_amount
     )
@@ -118,6 +119,7 @@ def get_report_by_category(
         date_from=date_from,
         date_to=date_to,
         categories=categories,
+        total_categories=len(categories),
         grand_total_consumptions=grand_total_consumptions,
         grand_total_amount=grand_total_amount
     )

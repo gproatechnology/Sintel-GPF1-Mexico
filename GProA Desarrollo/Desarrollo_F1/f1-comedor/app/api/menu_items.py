@@ -74,7 +74,7 @@ def delete_menu_item(
     current_user: User = Depends(get_current_user)
 ):
     """Soft delete a menu item"""
-    success = menu_item_service.delete_menu_item(db, menu_item_id)
-    if not success:
+    menu_item = menu_item_service.delete_menu_item(db, menu_item_id)
+    if menu_item is None:
         raise HTTPException(status_code=404, detail="Menu item not found")
     return None
