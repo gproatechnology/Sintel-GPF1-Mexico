@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # Prometheus para métricas
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: f1-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - f1-monitoring
+    restart: unless-stopped
+
+  # Grafana para dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: f1-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - f1-monitoring
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Exportador de métricas para PostgreSQL
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: f1-postgres-exporter
+    environment:
+      - DATA_SOURCE_NAME=postgresql://f1comedor:f1comedor123@db:5432/f1comedor?sslmode=disable
+    ports:
+      - "9187:9187"
+    networks:
+      - f1-comedor-network
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  # Exportador de métricas para la API
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: f1-node-exporter
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - f1-monitoring
+    restart: unless-stopped
+
+networks:
+  f1-monitoring:
+    driver: bridge
+  f1-comedor-network:
+    external: true
+
+volumes:
+  prometheus_data:
+  grafana_data:
