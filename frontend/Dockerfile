@@ -12,11 +12,11 @@ RUN npm install --include=dev
 # Copy source code
 COPY . .
 
-# Build arguments
-ARG VITE_API_URL=
+# Build arguments - receive from Render
+ARG VITE_API_URL
 
-# Set environment variable for build
-ENV VITE_API_URL=$VITE_API_URL
+# Set environment variable for build (default to empty if not provided)
+ENV VITE_API_URL=${VITE_API_URL:-}
 
 # Build the application
 RUN node ./node_modules/vite/bin/vite.js build

@@ -34,6 +34,7 @@ services:
     name: f1-frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile
+    rootDir: frontend
     region: oregon
     envVars:
       - key: VITE_API_URL
