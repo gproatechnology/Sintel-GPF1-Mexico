@@ -7,7 +7,7 @@ services:
     name: f1-comedor
     env: docker
     dockerfilePath: ./Dockerfile
-    dockerComposePath: ./docker-compose.full.yml
+    dockerComposeFile: docker-compose.full.yml
     region: oregon
     envVars:
       - key: DATABASE_URL
