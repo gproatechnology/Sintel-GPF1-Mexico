@@ -26,9 +26,6 @@ services:
         value: "f1-backend.onrender.com"
       - key: WWW_DOMAIN
         value: "www.f1-backend.onrender.com"
-    scaling:
-      minInstances: 0
-      maxInstances: 1
 
   # ===================
   # Frontend (React)
@@ -41,9 +38,6 @@ services:
     envVars:
       - key: VITE_API_URL
         value: "https://f1-backend.onrender.com"
-    scaling:
-      minInstances: 0
-      maxInstances: 1
 
 # PostgreSQL Database
 databases:
