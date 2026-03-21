@@ -1,31 +1,51 @@
-# render.yaml - Auto-deploy configuration for Render
+# render.yaml - Blueprint for Render deployment
+# Separate services: Backend (FastAPI) + Frontend (React)
 # https://render.com/docs/yaml
 
 services:
-  # Frontend + API (Web Service)
+  # ===================
+  # Backend (FastAPI)
+  # ===================
   - type: web
-    name: f1-comedor
+    name: f1-backend
     env: docker
     dockerfilePath: ./Dockerfile
-    dockerComposeFile: docker-compose.full.yml
     region: oregon
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: f1comedor
+          property: connectionString
       - key: SECRET_KEY
         sync: false
       - key: DB_PASSWORD
         sync: false
       - key: ALLOWED_ORIGINS
-        value: "https://f1-comedor.onrender.com"
-      - key: VITE_API_URL
-        value: "https://f1-comedor.onrender.com"
+        value: "https://f1-frontend.onrender.com"
       - key: DOMAIN
-        value: "f1-comedor.onrender.com"
+        value: "f1-backend.onrender.com"
       - key: WWW_DOMAIN
-        value: "www.f1-comedor.onrender.com"
+        value: "www.f1-backend.onrender.com"
+    scaling:
+      minInstances: 0
+      maxInstances: 1
 
-# PostgreSQL Database (Render managed)
+  # ===================
+  # Frontend (React)
+  # ===================
+  - type: web
+    name: f1-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    region: oregon
+    envVars:
+      - key: VITE_API_URL
+        value: "https://f1-backend.onrender.com"
+    scaling:
+      minInstances: 0
+      maxInstances: 1
+
+# PostgreSQL Database
 databases:
   - name: f1comedor
     region: oregon
