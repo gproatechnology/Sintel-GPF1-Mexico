@@ -30,11 +30,11 @@ services:
   # ===================
   # Frontend (React)
   # ===================
+  # NOTE: When creating this service in Render UI, set Root Directory to "frontend"
   - type: web
     name: f1-frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile
-    rootDir: frontend
     region: oregon
     envVars:
       - key: VITE_API_URL

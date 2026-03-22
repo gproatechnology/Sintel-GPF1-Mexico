@@ -27,9 +27,14 @@ FROM nginx:alpine
 # Copy built files from builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config (use nginx-ssl.conf for HTTPS)
+# Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 80 443
 
-CMD ["nginx", "-g", "daemon off;"]
+# Use entrypoint to configure API URL at runtime
+ENTRYPOINT ["/entrypoint.sh"]
